@@ -37,8 +37,17 @@ export default function App() {
           <h1>Mood Playlist Studio</h1>
         </div>
         <div className="header-actions">
-          <button className="ghost" onClick={toggleTheme} aria-pressed={theme === 'light'}>
-            {theme === 'light' ? 'Dark mode' : 'Light mode'}
+          <button
+            className="ghost mode-toggle"
+            onClick={toggleTheme}
+            role="switch"
+            aria-checked={theme === 'light'}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            <span className="mode-icon" aria-hidden="true">
+              {theme === 'light' ? '🌙' : '☀️'}
+            </span>
+            <span className="mode-label">{theme === 'light' ? 'Dark mode' : 'Light mode'}</span>
           </button>
           <span className="pill">High contrast</span>
           <button className="ghost" onClick={() => navigate('/')}>Start over</button>
