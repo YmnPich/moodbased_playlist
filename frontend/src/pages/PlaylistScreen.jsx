@@ -34,7 +34,7 @@ export default function PlaylistScreen({ session, onRegenerate, setSession }) {
       const response = await fetch(`${apiBase}/generate-playlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood: session.mood, vibes: session.vibes, controls: nextControls })
+        body: JSON.stringify({ mood: session.mood, tone: session.tone, vibes: session.vibes, controls: nextControls })
       });
       if (!response.ok) throw new Error('Unable to regenerate playlist');
       const data = await response.json();
@@ -54,6 +54,7 @@ export default function PlaylistScreen({ session, onRegenerate, setSession }) {
           <div>
             <h2 className="section-title">Your playlist</h2>
             <p className="notice">{session.playlist?.length || 0} tracks with reason tags and previews.</p>
+            <p className="notice">Tone: {session.tone === 'dark' ? 'Dark mood' : 'Light mood'}</p>
           </div>
           <div className="flex-row">
             {quickTweaks.map((tweak) => (

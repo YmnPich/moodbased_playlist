@@ -26,6 +26,7 @@ function buildTracks(preferences) {
       tempo: 90 + (idx % 8) * 5,
       reasonTags: [
         `${preferences?.dominantVibe || 'balanced'} vibe`,
+        `${preferences?.tone === 'dark' ? 'darker' : 'lighter'} mood`,
         `energy ${(preferences?.energy ?? 0.5) * 10}/10`,
         `tempo ${(preferences?.tempo ?? 0.5) * 10}/10`
       ],
@@ -35,20 +36,22 @@ function buildTracks(preferences) {
 }
 
 app.post('/api/generate-playlist', (req, res) => {
-  const { mood, vibes = [], controls = {} } = req.body || {};
+  const { mood, tone = 'light', vibes = [], controls = {} } = req.body || {};
   const playlist = buildTracks({
     trackCount: Math.min(Math.max(controls.trackCount || 25, 25), 50),
     energy: controls.energy,
     tempo: controls.tempo,
-    dominantVibe: vibes[0]
+    dominantVibe: vibes[0],
+    tone
   });
 
   res.json({
     playlist,
     mood,
+    tone,
     vibes,
     controls,
-    summary: `${mood || 'Custom'} playlist built with ${vibes.join(', ') || 'your picks'}`
+    summary: `${mood || 'Custom'} playlist built with ${vibes.join(', ') || 'your picks'} in a ${tone} mood`
   });
 });
 

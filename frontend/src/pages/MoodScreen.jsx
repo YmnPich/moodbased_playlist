@@ -9,12 +9,18 @@ const vibeOptions = [
   { id: 'nostalgia', label: 'Nostalgia' }
 ];
 
+const toneOptions = [
+  { id: 'light', label: 'Light mood', hint: 'Bright, airy picks' },
+  { id: 'dark', label: 'Dark mood', hint: 'Gritty, nocturnal picks' }
+];
+
 const defaultControls = { energy: 0.6, tempo: 0.5, acoustics: 0.4, trackCount: 25 };
 
 const apiBase = import.meta.env.VITE_API_BASE || '/api';
 
 export default function MoodScreen({ onGenerated, currentSession }) {
   const [mood, setMood] = useState(currentSession?.mood || '');
+  const [tone, setTone] = useState(currentSession?.tone || 'light');
   const [vibes, setVibes] = useState(currentSession?.vibes || ['sunny']);
   const [controls, setControls] = useState({ ...defaultControls, ...currentSession?.controls });
   const [loading, setLoading] = useState(false);
@@ -28,7 +34,14 @@ export default function MoodScreen({ onGenerated, currentSession }) {
     () => ([
       { key: 'energy', label: 'Energy', description: 'Keeps the flow lively', min: 0, max: 1, step: 0.05 },
       { key: 'tempo', label: 'Tempo', description: 'Controls BPM tilt', min: 0, max: 1, step: 0.05 },
-      { key: 'acoustics', label: 'Acoustic vs electronic', description: 'Higher values lean organic', min: 0, max: 1, step: 0.05 },
+      {
+        key: 'acoustics',
+        label: 'Acoustic vs electronic',
+        description: 'Higher values lean organic',
+        min: 0,
+        max: 1,
+        step: 0.05
+      }
     ]),
     []
   );
@@ -44,7 +57,7 @@ export default function MoodScreen({ onGenerated, currentSession }) {
       const response = await fetch(`${apiBase}/generate-playlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood, vibes, controls })
+        body: JSON.stringify({ mood, tone, vibes, controls })
       });
 
       if (!response.ok) throw new Error('Unable to reach the playlist engine');
@@ -76,6 +89,23 @@ export default function MoodScreen({ onGenerated, currentSession }) {
               </button>
             ))}
           </div>
+          <div style={{ marginTop: '14px' }}>
+            <p className="label-strong">Mood tone</p>
+            <p className="notice">Pick whether you want the mix to stay light or dark.</p>
+            <div className="flex-row" style={{ gap: '8px', flexWrap: 'wrap' }}>
+              {toneOptions.map((option) => (
+                <button
+                  key={option.id}
+                  className={`pill ${tone === option.id ? 'active' : ''}`}
+                  aria-pressed={tone === option.id}
+                  onClick={() => setTone(option.id)}
+                >
+                  <span className="label-strong">{option.label}</span>
+                  <small className="notice">{option.hint}</small>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <div>
           <h2 className="section-title">Fine tune it</h2>
@@ -87,7 +117,13 @@ export default function MoodScreen({ onGenerated, currentSession }) {
               </div>
               <input
                 id="moodInput"
-                style={{ padding: '10px', borderRadius: '10px', border: '1px solid var(--pill-border)', background: 'var(--input-bg)', color: 'var(--text)' }}
+                style={{
+                  padding: '10px',
+                  borderRadius: '10px',
+                  border: '1px solid var(--pill-border)',
+                  background: 'var(--input-bg)',
+                  color: 'var(--text)'
+                }}
                 type="text"
                 value={mood}
                 onChange={(e) => setMood(e.target.value)}

@@ -3,15 +3,16 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import MoodScreen from './pages/MoodScreen.jsx';
 import PlaylistScreen from './pages/PlaylistScreen.jsx';
 
-const defaultSession = { playlist: [], mood: '', vibes: [], controls: {} };
+const defaultSession = { playlist: [], mood: '', tone: 'light', vibes: [], controls: {} };
 
 export default function App() {
   const [session, setSession] = useState(defaultSession);
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
   const navigate = useNavigate();
 
   useEffect(() => {
     document.body.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -45,7 +46,16 @@ export default function App() {
       </header>
       <Routes>
         <Route path="/" element={<MoodScreen onGenerated={handleGenerated} currentSession={session} />} />
-        <Route path="/playlist" element={<PlaylistScreen session={value.session} onRegenerate={value.handleGenerated} setSession={value.setSession} />} />
+        <Route
+          path="/playlist"
+          element={
+            <PlaylistScreen
+              session={value.session}
+              onRegenerate={value.handleGenerated}
+              setSession={value.setSession}
+            />
+          }
+        />
       </Routes>
     </div>
   );
